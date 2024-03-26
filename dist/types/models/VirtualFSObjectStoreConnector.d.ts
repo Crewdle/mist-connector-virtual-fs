@@ -1,7 +1,6 @@
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 /**
  * The virtual file system object store connector.
- * @category Connector
  */
 export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     private readonly storeKey;

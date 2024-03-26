@@ -31,16 +31,6 @@ export function decrypt(encrypted: Buffer, key: string): Buffer {
 }
 
 /**
- * Get the parts of a path
- * @param path The path to split
- * @returns The parts of the path
- * @ignore
- */
-function getPathParts(path: string): string[] {
-  return path.split('/').filter((part) => part.length > 0);
-}
-
-/**
  * Get the path name of an object from a path and a name
  * @param path The path to the object
  * @param name The name of the object
@@ -62,4 +52,14 @@ export function splitPathName(pathName: string): [string, string] {
   const name = parts.pop() || '';
   const path = parts.join('/');
   return [path.length === 0 ? '/' : path, name];
+}
+
+/**
+ * Get the parts of a path
+ * @param path The path to split
+ * @returns The parts of the path
+ * @ignore
+ */
+function getPathParts(path: string): string[] {
+  return path.split('/').filter((part) => part.length > 0);
 }

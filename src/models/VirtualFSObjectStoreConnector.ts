@@ -1,12 +1,10 @@
 import * as fs from 'fs';
 
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
-import { decrypt, encrypt } from '../helpers/helpers';
-import { getPathName, splitPathName } from '../helpers/helpers';
+import { decrypt, encrypt, getPathName, splitPathName } from '../helpers/helpers';
 
 /**
  * The virtual file system object store connector.
- * @category Connector
  */
 export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
   /**
