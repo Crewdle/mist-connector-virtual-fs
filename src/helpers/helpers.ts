@@ -1,3 +1,4 @@
+import { Blob, BlobOptions } from 'buffer';
 import * as crypto from 'crypto';
 
 const algorithm = 'aes-256-ctr';
@@ -62,4 +63,36 @@ export function splitPathName(pathName: string): [string, string] {
  */
 function getPathParts(path: string): string[] {
   return path.split('/').filter((part) => part.length > 0);
+}
+
+/**
+ * A file in the node file system
+ * @ignore
+ */
+export class FilePolyfill extends Blob {
+  /**
+   * The name of the file
+   */
+  name: string = '';
+
+  /**
+   * The last modified time
+   */
+  lastModified: number = Date.now();
+
+  /**
+   * The webkit relative path
+   */
+  webkitRelativePath: string = '';
+
+  /**
+   * The constructor.
+   * @param data The data
+   * @param name The name
+   * @param options The options
+   */
+  constructor(data: ArrayBuffer[], name: string, options?: BlobOptions) {
+    super(data, options);
+    this.name = name;
+  }
 }

@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { Blob, BlobOptions } from 'buffer';
 /**
  * Encrypt a buffer with a key
  * @param buffer The buffer to encrypt
@@ -30,3 +31,28 @@ export declare function getPathName(path: string, name: string): string;
  * @ignore
  */
 export declare function splitPathName(pathName: string): [string, string];
+/**
+ * A file in the node file system
+ * @ignore
+ */
+export declare class FilePolyfill extends Blob {
+    /**
+     * The name of the file
+     */
+    name: string;
+    /**
+     * The last modified time
+     */
+    lastModified: number;
+    /**
+     * The webkit relative path
+     */
+    webkitRelativePath: string;
+    /**
+     * The constructor.
+     * @param data The data
+     * @param name The name
+     * @param options The options
+     */
+    constructor(data: ArrayBuffer[], name: string, options?: BlobOptions);
+}

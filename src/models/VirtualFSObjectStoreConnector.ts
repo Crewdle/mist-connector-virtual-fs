@@ -1,7 +1,10 @@
 import * as fs from 'fs';
+import { fileTypeFromBuffer } from 'file-type';
 
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
-import { decrypt, encrypt, getPathName, splitPathName } from '../helpers/helpers';
+import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers/helpers';
+
+global.File = FilePolyfill as any;
 
 /**
  * The virtual file system object store connector.
@@ -37,9 +40,10 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
 
     const encrypted: Buffer = fs.readFileSync(internalPath);
     const decrypted: Buffer = decrypt(encrypted, this.storeKey);
+    const type = await fileTypeFromBuffer(decrypted);
 
-    const file = new Blob([decrypted], { type: 'application/octet-stream' });
-    return file as File;
+    const file = new File([decrypted], path, { type: type?.mime ?? 'application/octet-stream' });
+    return file;
   }
 
   /**
