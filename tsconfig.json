@@ -1,12 +1,25 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    /* Language and Environment */
+    "target": "esnext",
+    "types": ["node"],
+
+    /* Modules */
+    "module": "esnext",
+    "moduleResolution": "Node",
+    "baseUrl": "src/",
+
+    /* Emit */
     "declaration": true,
     "outDir": "./dist/types",
-    "strict": true,
     "esModuleInterop": true,
-    "types": ["node"]
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+
+    /* Completeness */
+    "skipLibCheck": true
   },
   "include": ["src"],
 }

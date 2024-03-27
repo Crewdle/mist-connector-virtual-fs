@@ -1,13 +1,9 @@
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = () => {
   configs = {
     entry: './src/index.ts',
     target: 'node',
-    externals: [nodeExternals({
-      allowlist: ['node-datachannel/polyfill', 'node-datachannel']
-    })],
     devtool: false,
     module: {
       rules: [
@@ -25,9 +21,11 @@ module.exports = () => {
     output: {
       filename: 'index.js',
       path: path.resolve(__dirname, 'dist'),
+      libraryTarget: 'umd',
+      umdNamedDefine: true
     },
     optimization: {
-      minimize: true,
+      minimize: false,
     },
   };
 
