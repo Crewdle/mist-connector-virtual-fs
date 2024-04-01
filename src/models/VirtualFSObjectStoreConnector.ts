@@ -3,6 +3,7 @@ import { fileTypeFromBuffer } from 'file-type';
 
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers/helpers';
+import { IVirtualFSObjectStoreOptions } from 'types/VirtualFSObjectStoreOptions';
 
 global.File = FilePolyfill as any;
 
@@ -22,8 +23,10 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    */
   constructor(
     private readonly storeKey: string,
+    private readonly options?: IVirtualFSObjectStoreOptions,
   ) {
-    this.rootPath = `./data.enc/${this.storeKey}`;
+    const baseFolder = options?.baseFolder ?? '.';
+    this.rootPath = `${baseFolder}/data.enc/${this.storeKey}`;
 
     if (!fs.existsSync(this.rootPath)) {
       fs.mkdirSync(this.rootPath, { recursive: true });

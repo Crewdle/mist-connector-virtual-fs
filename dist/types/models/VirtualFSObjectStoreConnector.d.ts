@@ -1,9 +1,11 @@
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { IVirtualFSObjectStoreOptions } from 'types/VirtualFSObjectStoreOptions';
 /**
  * The virtual file system object store connector.
  */
 export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     private readonly storeKey;
+    private readonly options?;
     /**
      * The root path.
      * @ignore
@@ -13,7 +15,7 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * The constructor.
      * @param storeKey The store key.
      */
-    constructor(storeKey: string);
+    constructor(storeKey: string, options?: IVirtualFSObjectStoreOptions | undefined);
     /**
      * Get a file.
      * @param path The path.

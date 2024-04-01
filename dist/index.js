@@ -206,7 +206,8 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  VirtualFSObjectStoreConnector: () => (/* reexport */ VirtualFSObjectStoreConnector)
+  VirtualFSObjectStoreConnector: () => (/* reexport */ VirtualFSObjectStoreConnector),
+  getVirtualFSObjectStoreConnector: () => (/* binding */ getVirtualFSObjectStoreConnector)
 });
 
 ;// CONCATENATED MODULE: external "fs"
@@ -3433,6 +3434,7 @@ global.File = FilePolyfill;
  */
 class VirtualFSObjectStoreConnector {
     storeKey;
+    options;
     /**
      * The root path.
      * @ignore
@@ -3442,9 +3444,11 @@ class VirtualFSObjectStoreConnector {
      * The constructor.
      * @param storeKey The store key.
      */
-    constructor(storeKey) {
+    constructor(storeKey, options) {
         this.storeKey = storeKey;
-        this.rootPath = `./data.enc/${this.storeKey}`;
+        this.options = options;
+        const baseFolder = options?.baseFolder ?? '.';
+        this.rootPath = `${baseFolder}/data.enc/${this.storeKey}`;
         if (!external_fs_namespaceObject.existsSync(this.rootPath)) {
             external_fs_namespaceObject.mkdirSync(this.rootPath, { recursive: true });
         }
@@ -3568,6 +3572,22 @@ class VirtualFSObjectStoreConnector {
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
+
+/**
+ * Get the virtual file system object store connector.
+ * @param options The options.
+ * @returns The object store connector constructor.
+ */
+function getVirtualFSObjectStoreConnector(options) {
+    if (!options) {
+        return VirtualFSObjectStoreConnector;
+    }
+    return class VirtualFSObjectStoreConnectorWithInjectedOptions extends VirtualFSObjectStoreConnector {
+        constructor(storeKey) {
+            super(storeKey, options);
+        }
+    };
+}
 
 
 })();
