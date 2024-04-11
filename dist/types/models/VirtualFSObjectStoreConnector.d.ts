@@ -1,5 +1,5 @@
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
-import { IVirtualFSObjectStoreOptions } from 'types/VirtualFSObjectStoreOptions';
+import { IVirtualFSObjectStoreOptions } from '../types/VirtualFSObjectStoreOptions';
 /**
  * The virtual file system object store connector.
  */
