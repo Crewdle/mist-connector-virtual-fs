@@ -1,5 +1,5 @@
 import { ObjectStoreConnectorConstructor } from '@crewdle/web-sdk-types';
-import { IVirtualFSObjectStoreOptions } from './types/VirtualFSObjectStoreOptions';
+import { IVirtualFSObjectStoreOptions } from './models/VirtualFSObjectStoreOptions';
 import { VirtualFSObjectStoreConnector } from './models/VirtualFSObjectStoreConnector';
 
 /**

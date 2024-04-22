@@ -1,11 +1,11 @@
 {
   "name": "@crewdle/mist-connector-virtual-fs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Crewdle Mist connector to use a virtual file system as an Object Store",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "webpack build --mode=production"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -24,11 +24,8 @@
     "file-type": "^19.0.0"
   },
   "devDependencies": {
-    "@crewdle/web-sdk-types": "^1.0.0",
+    "@crewdle/web-sdk-types": "^1.0.7",
     "@types/node": "^20.11.27",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.4.2",
-    "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4"
+    "typescript": "^5.4.2"
   }
 }

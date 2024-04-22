@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import { fileTypeFromBuffer } from 'file-type';
 
 import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
-import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers/helpers';
-import { IVirtualFSObjectStoreOptions } from '../types/VirtualFSObjectStoreOptions';
+import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers';
+import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 
 global.File = FilePolyfill as any;
 
