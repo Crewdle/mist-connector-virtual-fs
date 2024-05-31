@@ -5,7 +5,7 @@ import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
  */
 export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     private readonly storeKey;
-    private readonly options?;
+    readonly options?: IVirtualFSObjectStoreOptions | undefined;
     /**
      * The root path.
      * @ignore
@@ -41,7 +41,7 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * @param path The path.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file: File, path?: string | undefined): Promise<void>;
+    writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<void>;
     /**
      * Move an object.
      * @param path The path.

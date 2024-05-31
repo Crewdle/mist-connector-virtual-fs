@@ -23,7 +23,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    */
   constructor(
     private readonly storeKey: string,
-    private readonly options?: IVirtualFSObjectStoreOptions,
+    readonly options?: IVirtualFSObjectStoreOptions,
   ) {
     const baseFolder = options?.baseFolder ?? '.';
     this.rootPath = `${baseFolder}/data.enc/${this.storeKey}`;
@@ -70,6 +70,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
           name: object,
           path: path,
           pathName: pathName,
+          absolutePathName: `${internalPath}/${pathName}`,
           entries: recursive ? await this.list(pathName, recursive) : [],
         });
       } else {
@@ -78,6 +79,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
           name: object,
           path: path,
           pathName: pathName,
+          absolutePathName: `${internalPath}/${pathName}`,
           type: 'application/octet-stream',
           size: stats.size,
         });
@@ -103,14 +105,16 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path.
    * @returns A promise that resolves when the file is written.
    */
-  async writeFile(file: File, path?: string | undefined): Promise<void> {
+  async writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<void> {
     const internalPath = getPathName(this.rootPath, path || '');
-    const fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
-    const encrypted = encrypt(fileBuffer, this.storeKey);
+    let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
+    if (!skipEncryption) {
+      fileBuffer = encrypt(fileBuffer, this.storeKey);
+    }
     if (!fs.existsSync(internalPath)) {
       fs.mkdirSync(internalPath, { recursive: true });
     }
-    fs.writeFileSync(internalPath, encrypted);
+    fs.writeFileSync(internalPath, fileBuffer);
   }
 
   /**

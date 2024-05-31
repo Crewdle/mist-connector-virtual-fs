@@ -24,7 +24,7 @@
     "file-type": "^19.0.0"
   },
   "devDependencies": {
-    "@crewdle/web-sdk-types": "^1.0.7",
+    "@crewdle/web-sdk-types": "git@github.com:Crewdle/web-sdk-types.git#CA-2230-upload-models",
     "@types/node": "^20.11.27",
     "typescript": "^5.4.2"
   }

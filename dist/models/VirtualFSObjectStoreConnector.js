@@ -92,6 +92,7 @@ class VirtualFSObjectStoreConnector {
                         name: object,
                         path: path,
                         pathName: pathName,
+                        absolutePathName: `${internalPath}/${pathName}`,
                         entries: recursive ? yield this.list(pathName, recursive) : [],
                     });
                 }
@@ -101,6 +102,7 @@ class VirtualFSObjectStoreConnector {
                         name: object,
                         path: path,
                         pathName: pathName,
+                        absolutePathName: `${internalPath}/${pathName}`,
                         type: 'application/octet-stream',
                         size: stats.size,
                     });
@@ -126,15 +128,17 @@ class VirtualFSObjectStoreConnector {
      * @param path The path.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file, path) {
+    writeFile(file, path, skipEncryption) {
         return __awaiter(this, void 0, void 0, function* () {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path || '');
-            const fileBuffer = Buffer.from(yield file.arrayBuffer());
-            const encrypted = (0, helpers_1.encrypt)(fileBuffer, this.storeKey);
+            let fileBuffer = Buffer.from(yield file.arrayBuffer());
+            if (!skipEncryption) {
+                fileBuffer = (0, helpers_1.encrypt)(fileBuffer, this.storeKey);
+            }
             if (!fs.existsSync(internalPath)) {
                 fs.mkdirSync(internalPath, { recursive: true });
             }
-            fs.writeFileSync(internalPath, encrypted);
+            fs.writeFileSync(internalPath, fileBuffer);
         });
     }
     /**
