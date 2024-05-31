@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { fileTypeFromBuffer } from 'file-type';
 
-import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 
@@ -70,7 +70,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
           name: object,
           path: path,
           pathName: pathName,
-          absolutePathName: `${internalPath}/${pathName}`,
+          absolutePathName: `${internalPath}/${object}`,
           entries: recursive ? await this.list(pathName, recursive) : [],
         });
       } else {
@@ -79,7 +79,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
           name: object,
           path: path,
           pathName: pathName,
-          absolutePathName: `${internalPath}/${pathName}`,
+          absolutePathName: `${internalPath}/${object}`,
           type: 'application/octet-stream',
           size: stats.size,
         });
@@ -94,9 +94,19 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path.
    * @returns A promise that resolves when the folder is created.
    */
-  async createFolder(path: string): Promise<void> {
+  async createFolder(path: string): Promise<IFolderDescriptor> {
     const internalPath = getPathName(this.rootPath, path);
     fs.mkdirSync(internalPath, { recursive: true });
+
+    const [folderPath, name] = splitPathName(path);
+
+    return {
+      kind: ObjectKind.Folder,
+      name: name,
+      path: folderPath,
+      pathName: path,
+      absolutePathName: internalPath,
+    };
   }
 
   /**
@@ -105,7 +115,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path.
    * @returns A promise that resolves when the file is written.
    */
-  async writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<void> {
+  async writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<IFileDescriptor> {
     const internalPath = getPathName(this.rootPath, path || '');
     let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
     if (!skipEncryption) {
@@ -115,6 +125,16 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
       fs.mkdirSync(internalPath, { recursive: true });
     }
     fs.writeFileSync(internalPath, fileBuffer);
+
+    return {
+      kind: ObjectKind.File,
+      name: file.name,
+      path: path || '/',
+      pathName: getPathName(path || '/', file.name),
+      absolutePathName: internalPath,
+      type: file.type,
+      size: file.size,
+    };
   }
 
   /**

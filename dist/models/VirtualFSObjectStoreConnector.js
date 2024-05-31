@@ -92,7 +92,7 @@ class VirtualFSObjectStoreConnector {
                         name: object,
                         path: path,
                         pathName: pathName,
-                        absolutePathName: `${internalPath}/${pathName}`,
+                        absolutePathName: `${internalPath}/${object}`,
                         entries: recursive ? yield this.list(pathName, recursive) : [],
                     });
                 }
@@ -102,7 +102,7 @@ class VirtualFSObjectStoreConnector {
                         name: object,
                         path: path,
                         pathName: pathName,
-                        absolutePathName: `${internalPath}/${pathName}`,
+                        absolutePathName: `${internalPath}/${object}`,
                         type: 'application/octet-stream',
                         size: stats.size,
                     });
@@ -120,6 +120,14 @@ class VirtualFSObjectStoreConnector {
         return __awaiter(this, void 0, void 0, function* () {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
             fs.mkdirSync(internalPath, { recursive: true });
+            const [folderPath, name] = (0, helpers_1.splitPathName)(path);
+            return {
+                kind: web_sdk_types_1.ObjectKind.Folder,
+                name: name,
+                path: folderPath,
+                pathName: path,
+                absolutePathName: internalPath,
+            };
         });
     }
     /**
@@ -139,6 +147,15 @@ class VirtualFSObjectStoreConnector {
                 fs.mkdirSync(internalPath, { recursive: true });
             }
             fs.writeFileSync(internalPath, fileBuffer);
+            return {
+                kind: web_sdk_types_1.ObjectKind.File,
+                name: file.name,
+                path: path || '/',
+                pathName: (0, helpers_1.getPathName)(path || '/', file.name),
+                absolutePathName: internalPath,
+                type: file.type,
+                size: file.size,
+            };
         });
     }
     /**

@@ -1,4 +1,4 @@
-import { IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 /**
  * The virtual file system object store connector.
@@ -34,14 +34,14 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * @param path The path.
      * @returns A promise that resolves when the folder is created.
      */
-    createFolder(path: string): Promise<void>;
+    createFolder(path: string): Promise<IFolderDescriptor>;
     /**
      * Write a file.
      * @param file The file.
      * @param path The path.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<void>;
+    writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<IFileDescriptor>;
     /**
      * Move an object.
      * @param path The path.
