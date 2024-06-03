@@ -116,7 +116,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @returns A promise that resolves when the file is written.
    */
   async writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<IFileDescriptor> {
-    const internalPath = getPathName(this.rootPath, path === '/' ? '' : path || '');
+    const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
     let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
     if (!skipEncryption) {
       fileBuffer = encrypt(fileBuffer, this.storeKey);
