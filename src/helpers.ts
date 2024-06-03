@@ -11,8 +11,9 @@ const algorithm = 'aes-256-ctr';
  * @ignore
  */
 export function encrypt(buffer: Buffer, key: string): Buffer {
+  const hashedKey = crypto.createHash('sha256').update(key).digest();
   const iv: Buffer = crypto.randomBytes(16);
-  const cipher: crypto.Cipher = crypto.createCipheriv(algorithm, key, iv);
+  const cipher: crypto.Cipher = crypto.createCipheriv(algorithm, hashedKey, iv);
   const result: Buffer = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
   return result;
 }
@@ -25,9 +26,10 @@ export function encrypt(buffer: Buffer, key: string): Buffer {
  * @ignore
  */
 export function decrypt(encrypted: Buffer, key: string): Buffer {
+  const hashedKey = crypto.createHash('sha256').update(key).digest();
   const iv: Buffer = encrypted.slice(0, 16);
   const data: Buffer = encrypted.slice(16);
-  const decipher: crypto.Decipher = crypto.createDecipheriv(algorithm, key, iv);
+  const decipher: crypto.Decipher = crypto.createDecipheriv(algorithm, hashedKey, iv);
   return Buffer.concat([decipher.update(data), decipher.final()]);
 }
 
