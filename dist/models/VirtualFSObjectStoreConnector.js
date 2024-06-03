@@ -138,7 +138,7 @@ class VirtualFSObjectStoreConnector {
      */
     writeFile(file, path, skipEncryption) {
         return __awaiter(this, void 0, void 0, function* () {
-            const internalPath = (0, helpers_1.getPathName)(this.rootPath, path || '');
+            const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path || '');
             let fileBuffer = Buffer.from(yield file.arrayBuffer());
             if (!skipEncryption) {
                 fileBuffer = (0, helpers_1.encrypt)(fileBuffer, this.storeKey);
@@ -146,7 +146,7 @@ class VirtualFSObjectStoreConnector {
             if (!fs.existsSync(internalPath)) {
                 fs.mkdirSync(internalPath, { recursive: true });
             }
-            fs.writeFileSync(internalPath, fileBuffer);
+            fs.writeFileSync((0, helpers_1.getPathName)(internalPath, file.name), fileBuffer);
             return {
                 kind: web_sdk_types_1.ObjectKind.File,
                 name: file.name,
