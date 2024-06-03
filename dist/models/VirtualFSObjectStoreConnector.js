@@ -138,7 +138,7 @@ class VirtualFSObjectStoreConnector {
      */
     writeFile(file, path, skipEncryption) {
         return __awaiter(this, void 0, void 0, function* () {
-            const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path || '');
+            const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
             let fileBuffer = Buffer.from(yield file.arrayBuffer());
             if (!skipEncryption) {
                 fileBuffer = (0, helpers_1.encrypt)(fileBuffer, this.storeKey);
