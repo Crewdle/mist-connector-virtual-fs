@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { fileTypeFromBuffer } from 'file-type';
 
-import { IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { FileStatus, IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 
@@ -82,6 +82,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
           absolutePathName: `${internalPath}/${object}`,
           type: 'application/octet-stream',
           size: stats.size,
+          status: FileStatus.Synced,
         });
       }
     }
@@ -134,6 +135,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
       absolutePathName: internalPath,
       type: file.type,
       size: file.size,
+      status: FileStatus.Synced,
     };
   }
 

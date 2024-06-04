@@ -105,6 +105,7 @@ class VirtualFSObjectStoreConnector {
                         absolutePathName: `${internalPath}/${object}`,
                         type: 'application/octet-stream',
                         size: stats.size,
+                        status: web_sdk_types_1.FileStatus.Synced,
                     });
                 }
             }
@@ -155,6 +156,7 @@ class VirtualFSObjectStoreConnector {
                 absolutePathName: internalPath,
                 type: file.type,
                 size: file.size,
+                status: web_sdk_types_1.FileStatus.Synced,
             };
         });
     }
