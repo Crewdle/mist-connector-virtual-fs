@@ -1,6 +1,6 @@
 {
   "name": "@crewdle/mist-connector-virtual-fs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Crewdle Mist connector to use a virtual file system as an Object Store",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
