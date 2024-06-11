@@ -207,7 +207,24 @@ class VirtualFSObjectStoreConnector {
         return __awaiter(this, void 0, void 0, function* () {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
             const stats = fs.statSync(internalPath);
-            return stats.size;
+            if (stats.isDirectory()) {
+                let totalSize = 0;
+                const objects = fs.readdirSync(internalPath);
+                for (const object of objects) {
+                    const objectPath = `${internalPath}/${object}`;
+                    const objectStats = fs.statSync(objectPath);
+                    if (objectStats.isDirectory()) {
+                        totalSize += yield this.calculateSize(`${path}/${object}`);
+                    }
+                    else {
+                        totalSize += objectStats.size;
+                    }
+                }
+                return totalSize;
+            }
+            else {
+                return stats.size;
+            }
         });
     }
 }

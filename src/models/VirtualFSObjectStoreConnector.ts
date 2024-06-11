@@ -175,13 +175,28 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
   }
 
   /**
-   * Calculate the size of an object.
+   * Calculate the size of an object and its children at the given path.
    * @param path The path.
    * @returns A promise that resolves with the size of the object.
    */
   async calculateSize(path: string): Promise<number> {
     const internalPath = getPathName(this.rootPath, path);
     const stats = fs.statSync(internalPath);
-    return stats.size;
+    if (stats.isDirectory()) {
+      let totalSize = 0;
+      const objects = fs.readdirSync(internalPath);
+      for (const object of objects) {
+        const objectPath = `${internalPath}/${object}`;
+        const objectStats = fs.statSync(objectPath);
+        if (objectStats.isDirectory()) {
+          totalSize += await this.calculateSize(`${path}/${object}`);
+        } else {
+          totalSize += objectStats.size;
+        }
+      }
+      return totalSize;
+    } else {
+      return stats.size;
+    }
   }
 }
