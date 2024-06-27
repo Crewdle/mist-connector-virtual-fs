@@ -37,6 +37,7 @@ const fs = __importStar(require("fs"));
 const file_type_1 = require("file-type");
 const web_sdk_types_1 = require("@crewdle/web-sdk-types");
 const helpers_1 = require("../helpers");
+const VirtualFSWritableStream_1 = require("./VirtualFSWritableStream");
 global.File = helpers_1.FilePolyfill;
 /**
  * The virtual file system object store connector.
@@ -161,6 +162,17 @@ class VirtualFSObjectStoreConnector {
         });
     }
     /**
+     * Creates a writable stream for a file.
+     * @param path The path to the file.
+     * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
+     */
+    createWritableStream(path) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const writable = fs.createWriteStream(path, { flags: 'a' });
+            return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable);
+        });
+    }
+    /**
      * Move an object.
      * @param path The path.
      * @param newPath The new path.
@@ -199,7 +211,7 @@ class VirtualFSObjectStoreConnector {
         });
     }
     /**
-     * Calculate the size of an object.
+     * Calculate the size of an object and its children at the given path.
      * @param path The path.
      * @returns A promise that resolves with the size of the object.
      */
