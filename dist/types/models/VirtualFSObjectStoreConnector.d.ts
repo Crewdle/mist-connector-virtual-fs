@@ -47,7 +47,7 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * @param path The path to the file.
      * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
      */
-    createWritableStream(path: string): Promise<IWritableStream>;
+    createWritableStream(pathName: string): Promise<IWritableStream>;
     /**
      * Move an object.
      * @param path The path.

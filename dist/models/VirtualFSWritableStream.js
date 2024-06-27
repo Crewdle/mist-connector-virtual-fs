@@ -21,13 +21,18 @@ class VirtualFSWritableStream {
     constructor(stream) {
         this.stream = stream;
     }
+    /**
+     * Writes a chunk of data to the stream.
+     * @param chunk The chunk of data to write.
+     * @returns A promise that resolves when the write operation is complete.
+     */
     write(chunk) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 const buffer = Buffer.from(chunk);
-                this.stream.write(buffer, (err) => {
-                    if (err) {
-                        reject(err);
+                this.stream.write(buffer, (error) => {
+                    if (error) {
+                        reject(error);
                     }
                     else {
                         resolve();
@@ -36,11 +41,19 @@ class VirtualFSWritableStream {
             });
         });
     }
+    /**
+     * Closes the stream.
+     * @returns A promise that resolves when the stream is closed.
+     */
     close() {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
+                this.stream.on('error', (error) => {
+                    reject(error);
+                });
                 this.stream.end(() => {
                     resolve();
+                    this.stream.destroy();
                 });
             });
         });

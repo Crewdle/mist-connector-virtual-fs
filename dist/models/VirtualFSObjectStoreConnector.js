@@ -166,9 +166,15 @@ class VirtualFSObjectStoreConnector {
      * @param path The path to the file.
      * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
      */
-    createWritableStream(path) {
+    createWritableStream(pathName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const writable = fs.createWriteStream(path, { flags: 'a' });
+            const [path, name] = (0, helpers_1.splitPathName)(pathName);
+            const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
+            if (!fs.existsSync(internalPath)) {
+                fs.mkdirSync(internalPath, { recursive: true });
+            }
+            const internalPathName = (0, helpers_1.getPathName)(internalPath, name);
+            const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
             return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable);
         });
     }

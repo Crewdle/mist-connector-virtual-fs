@@ -146,8 +146,16 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path to the file.
    * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
    */
-  async createWritableStream(path: string): Promise<IWritableStream> {
-    const writable = fs.createWriteStream(path, { flags: 'a' });
+  async createWritableStream(pathName: string): Promise<IWritableStream> {
+    const [path, name] = splitPathName(pathName);
+    const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
+    if (!fs.existsSync(internalPath)) {
+      fs.mkdirSync(internalPath, { recursive: true });
+    }
+
+    const internalPathName = getPathName(internalPath, name);
+    const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
+
     return new VirtualFSWritableStream(writable);
   }
 
