@@ -1,5 +1,6 @@
 import * as fs from 'fs';
-import { IWritableStream } from "@crewdle/web-sdk-types";
+import { IFileWriteOptions, IWritableStream } from "@crewdle/web-sdk-types";
+import { encrypt } from '../helpers';
 
 /**
  * Represents a writable stream for a file.
@@ -10,8 +11,7 @@ export class VirtualFSWritableStream implements IWritableStream {
    * Creates a writable stream for a file.
    * @param stream The write stream to be used.
    */
-  constructor(private stream: fs.WriteStream) {
-  }
+  constructor(private stream: fs.WriteStream, private writeOptions: IFileWriteOptions, private storeKey: string) {}
 
   /**
    * Writes a chunk of data to the stream.
@@ -20,7 +20,12 @@ export class VirtualFSWritableStream implements IWritableStream {
    */
   async write(chunk: ArrayBuffer): Promise<void> {
     return new Promise((resolve, reject) => {
-      const buffer = Buffer.from(chunk);
+      let buffer = Buffer.from(chunk);
+
+      if (!this.writeOptions.skipEncryption) {
+        buffer = encrypt(buffer, this.storeKey);
+      }
+
       this.stream.write(buffer, (error) => {
         if (error) {
           reject(error);

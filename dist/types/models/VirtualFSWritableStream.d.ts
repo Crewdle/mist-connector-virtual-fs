@@ -1,16 +1,18 @@
 /// <reference types="node" />
 import * as fs from 'fs';
-import { IWritableStream } from "@crewdle/web-sdk-types";
+import { IFileWriteOptions, IWritableStream } from "@crewdle/web-sdk-types";
 /**
  * Represents a writable stream for a file.
  */
 export declare class VirtualFSWritableStream implements IWritableStream {
     private stream;
+    private writeOptions;
+    private storeKey;
     /**
      * Creates a writable stream for a file.
      * @param stream The write stream to be used.
      */
-    constructor(stream: fs.WriteStream);
+    constructor(stream: fs.WriteStream, writeOptions: IFileWriteOptions, storeKey: string);
     /**
      * Writes a chunk of data to the stream.
      * @param chunk The chunk of data to write.

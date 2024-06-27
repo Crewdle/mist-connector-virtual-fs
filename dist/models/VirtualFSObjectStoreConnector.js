@@ -138,8 +138,8 @@ class VirtualFSObjectStoreConnector {
      * @param path The path.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file, path, skipEncryption) {
-        return __awaiter(this, void 0, void 0, function* () {
+    writeFile(file_1, path_1) {
+        return __awaiter(this, arguments, void 0, function* (file, path, { skipEncryption } = {}) {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
             let fileBuffer = Buffer.from(yield file.arrayBuffer());
             if (!skipEncryption) {
@@ -166,8 +166,8 @@ class VirtualFSObjectStoreConnector {
      * @param path The path to the file.
      * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
      */
-    createWritableStream(pathName) {
-        return __awaiter(this, void 0, void 0, function* () {
+    createWritableStream(pathName_1) {
+        return __awaiter(this, arguments, void 0, function* (pathName, writeOptions = {}) {
             const [path, name] = (0, helpers_1.splitPathName)(pathName);
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
             if (!fs.existsSync(internalPath)) {
@@ -175,7 +175,7 @@ class VirtualFSObjectStoreConnector {
             }
             const internalPathName = (0, helpers_1.getPathName)(internalPath, name);
             const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
-            return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable);
+            return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable, writeOptions, this.storeKey);
         });
     }
     /**

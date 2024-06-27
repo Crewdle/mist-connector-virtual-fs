@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { fileTypeFromBuffer } from 'file-type';
 
-import { FileStatus, IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { FileStatus, IFileDescriptor, IFileWriteOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 
 import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
@@ -118,7 +118,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path.
    * @returns A promise that resolves when the file is written.
    */
-  async writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<IFileDescriptor> {
+  async writeFile(file: File, path?: string, { skipEncryption }: IFileWriteOptions = {}): Promise<IFileDescriptor> {
     const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
     let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
     if (!skipEncryption) {
@@ -146,7 +146,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path to the file.
    * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
    */
-  async createWritableStream(pathName: string): Promise<IWritableStream> {
+  async createWritableStream(pathName: string, writeOptions: IFileWriteOptions = {}): Promise<IWritableStream> {
     const [path, name] = splitPathName(pathName);
     const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
     if (!fs.existsSync(internalPath)) {
@@ -156,7 +156,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     const internalPathName = getPathName(internalPath, name);
     const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
 
-    return new VirtualFSWritableStream(writable);
+    return new VirtualFSWritableStream(writable, writeOptions, this.storeKey);
   }
 
   /**

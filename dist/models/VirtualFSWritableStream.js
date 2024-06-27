@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualFSWritableStream = void 0;
+const helpers_1 = require("../helpers");
 /**
  * Represents a writable stream for a file.
  */
@@ -18,8 +19,10 @@ class VirtualFSWritableStream {
      * Creates a writable stream for a file.
      * @param stream The write stream to be used.
      */
-    constructor(stream) {
+    constructor(stream, writeOptions, storeKey) {
         this.stream = stream;
+        this.writeOptions = writeOptions;
+        this.storeKey = storeKey;
     }
     /**
      * Writes a chunk of data to the stream.
@@ -29,7 +32,10 @@ class VirtualFSWritableStream {
     write(chunk) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                const buffer = Buffer.from(chunk);
+                let buffer = Buffer.from(chunk);
+                if (!this.writeOptions.skipEncryption) {
+                    buffer = (0, helpers_1.encrypt)(buffer, this.storeKey);
+                }
                 this.stream.write(buffer, (error) => {
                     if (error) {
                         reject(error);
