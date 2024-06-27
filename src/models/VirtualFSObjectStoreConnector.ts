@@ -1,9 +1,11 @@
 import * as fs from 'fs';
 import { fileTypeFromBuffer } from 'file-type';
 
-import { FileStatus, IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { FileStatus, IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+
 import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
+import { VirtualFSWritableStream } from './VirtualFSWritableStream';
 
 global.File = FilePolyfill as any;
 
@@ -137,6 +139,16 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
       size: file.size,
       status: FileStatus.Synced,
     };
+  }
+
+  /**
+   * Creates a writable stream for a file.
+   * @param path The path to the file.
+   * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
+   */
+  async createWritableStream(path: string): Promise<IWritableStream> {
+    const writable = fs.createWriteStream(path, { flags: 'a' });
+    return new VirtualFSWritableStream(writable);
   }
 
   /**

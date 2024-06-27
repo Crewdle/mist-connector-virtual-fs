@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "types": "cd ../web-sdk-types && npm run build && cp -r dist/* ../mist-connector-virtual-fs/node_modules/@crewdle/web-sdk-types/dist"
   },
   "repository": {
     "type": "git",
