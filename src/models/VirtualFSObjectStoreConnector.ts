@@ -1,11 +1,12 @@
 import * as fs from 'fs';
-import { fileTypeFromBuffer } from 'file-type';
+import mime from 'mime';
 
-import { FileStatus, IFileDescriptor, IFileWriteOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { FileStatus, IFile, IFileDescriptor, IFileOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 
-import { FilePolyfill, decrypt, encrypt, getPathName, splitPathName } from '../helpers';
+import { FilePolyfill, encrypt, getPathName, splitPathName } from '../helpers';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 import { VirtualFSWritableStream } from './VirtualFSWritableStream';
+import { VirtualFSFile } from './VirtualFSFile';
 
 global.File = FilePolyfill as any;
 
@@ -40,15 +41,15 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path.
    * @returns A promise that resolves with the file.
    */
-  async get(path: string): Promise<File> {
+  // TODO - Need to expose a virtual file handle to the client
+  async get(path: string, writeOptions: IFileOptions): Promise<IFile> {
     const internalPath = getPathName(this.rootPath, path);
+    const [folderPath, name] = splitPathName(path);
+    const stats = fs.statSync(internalPath);
+    const size = stats.size;
+    const type = mime.getType(internalPath) || 'application/octet-stream';
 
-    const encrypted: Buffer = fs.readFileSync(internalPath);
-    const decrypted: Buffer = decrypt(encrypted, this.storeKey);
-    const type = await fileTypeFromBuffer(decrypted);
-
-    const file = new File([decrypted], path, { type: type?.mime ?? 'application/octet-stream' });
-    return file;
+    return new VirtualFSFile(name, path, size, type, this.storeKey, writeOptions);
   }
 
   /**
@@ -118,7 +119,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path.
    * @returns A promise that resolves when the file is written.
    */
-  async writeFile(file: File, path?: string, { skipEncryption }: IFileWriteOptions = {}): Promise<IFileDescriptor> {
+  async writeFile(file: File, path?: string, { skipEncryption }: IFileOptions = {}): Promise<IFileDescriptor> {
     const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
     let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
     if (!skipEncryption) {
@@ -146,7 +147,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param path The path to the file.
    * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
    */
-  async createWritableStream(pathName: string, writeOptions: IFileWriteOptions = {}): Promise<IWritableStream> {
+  async createWritableStream(pathName: string, writeOptions: IFileOptions = {}): Promise<IWritableStream> {
     const [path, name] = splitPathName(pathName);
     const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
     if (!fs.existsSync(internalPath)) {

@@ -31,13 +31,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualFSObjectStoreConnector = void 0;
 const fs = __importStar(require("fs"));
-const file_type_1 = require("file-type");
+const mime_1 = __importDefault(require("mime"));
 const web_sdk_types_1 = require("@crewdle/web-sdk-types");
 const helpers_1 = require("../helpers");
 const VirtualFSWritableStream_1 = require("./VirtualFSWritableStream");
+const VirtualFSFile_1 = require("./VirtualFSFile");
 global.File = helpers_1.FilePolyfill;
 /**
  * The virtual file system object store connector.
@@ -62,15 +66,22 @@ class VirtualFSObjectStoreConnector {
      * @param path The path.
      * @returns A promise that resolves with the file.
      */
-    get(path) {
+    // TODO - Need to expose a virtual file handle to the client
+    get(path, writeOptions) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
-            const encrypted = fs.readFileSync(internalPath);
-            const decrypted = (0, helpers_1.decrypt)(encrypted, this.storeKey);
-            const type = yield (0, file_type_1.fileTypeFromBuffer)(decrypted);
-            const file = new File([decrypted], path, { type: (_a = type === null || type === void 0 ? void 0 : type.mime) !== null && _a !== void 0 ? _a : 'application/octet-stream' });
-            return file;
+            const [folderPath, name] = (0, helpers_1.splitPathName)(path);
+            let buffer;
+            // const encrypted: Buffer = fs.readFileSync(internalPath);
+            // TODO should not decrypt llms
+            // const decrypted: Buffer = decrypt(encrypted, this.storeKey);
+            // const type = await fileTypeFromBuffer(decrypted);
+            const stats = fs.statSync(internalPath);
+            const size = stats.size;
+            const type = mime_1.default.getType(internalPath) || 'application/octet-stream';
+            // Virtual FS needs to return something from which we can read content.
+            // It also needs to perform decryption when not skipping encryption.
+            return new VirtualFSFile_1.VirtualFSFile(name, path, size, type, this.storeKey, writeOptions);
         });
     }
     /**

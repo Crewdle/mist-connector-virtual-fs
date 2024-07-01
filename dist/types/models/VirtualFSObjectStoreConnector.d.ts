@@ -1,4 +1,4 @@
-import { IFileDescriptor, IFileWriteOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { IFile, IFileDescriptor, IFileOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 /**
  * The virtual file system object store connector.
@@ -21,7 +21,7 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * @param path The path.
      * @returns A promise that resolves with the file.
      */
-    get(path: string): Promise<File>;
+    get(path: string, writeOptions: IFileOptions): Promise<IFile>;
     /**
      * List the objects.
      * @param path The path.
@@ -41,13 +41,13 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * @param path The path.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file: File, path?: string, { skipEncryption }?: IFileWriteOptions): Promise<IFileDescriptor>;
+    writeFile(file: File, path?: string, { skipEncryption }?: IFileOptions): Promise<IFileDescriptor>;
     /**
      * Creates a writable stream for a file.
      * @param path The path to the file.
      * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
      */
-    createWritableStream(pathName: string, writeOptions?: IFileWriteOptions): Promise<IWritableStream>;
+    createWritableStream(pathName: string, writeOptions?: IFileOptions): Promise<IWritableStream>;
     /**
      * Move an object.
      * @param path The path.

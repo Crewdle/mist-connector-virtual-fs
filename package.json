@@ -22,7 +22,8 @@
     "dist/"
   ],
   "dependencies": {
-    "file-type": "^19.0.0"
+    "file-type": "^19.0.0",
+    "mime": "^4.0.3"
   },
   "devDependencies": {
     "@crewdle/web-sdk-types": "^1.0.12",

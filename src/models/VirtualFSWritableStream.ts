@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { IFileWriteOptions, IWritableStream } from "@crewdle/web-sdk-types";
+import { IFileOptions, IWritableStream } from "@crewdle/web-sdk-types";
 import { encrypt } from '../helpers';
 
 /**
@@ -11,7 +11,7 @@ export class VirtualFSWritableStream implements IWritableStream {
    * Creates a writable stream for a file.
    * @param stream The write stream to be used.
    */
-  constructor(private stream: fs.WriteStream, private writeOptions: IFileWriteOptions, private storeKey: string) {}
+  constructor(private stream: fs.WriteStream, private writeOptions: IFileOptions, private storeKey: string) {}
 
   /**
    * Writes a chunk of data to the stream.
