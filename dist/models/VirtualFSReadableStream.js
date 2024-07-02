@@ -10,12 +10,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualFSReadableStream = void 0;
-// Implement the interface for Node.js environment
+/**
+ * Represents a readable stream for a virtual file system.
+ */
 class VirtualFSReadableStream {
+    /**
+     * Creates a new instance of VirtualFSReadableStream.
+     * @param stream The underlying fs.ReadStream object.
+     */
     constructor(stream) {
         this.stream = stream;
         this.stream = stream;
     }
+    /**
+     * Reads data from the stream.
+     * @returns A promise that resolves to a Uint8Array or null if the end of the stream has been reached.
+     */
     read() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
@@ -43,6 +53,10 @@ class VirtualFSReadableStream {
             });
         });
     }
+    /**
+     * Closes the stream.
+     * @returns A promise that resolves when the stream is closed.
+     */
     close() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {

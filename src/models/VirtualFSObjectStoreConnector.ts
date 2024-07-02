@@ -49,7 +49,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     const size = stats.size;
     const type = mime.getType(internalPath) || 'application/octet-stream';
 
-    return new VirtualFSFile(name, path, size, type, this.storeKey, writeOptions);
+    return new VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, writeOptions);
   }
 
   /**

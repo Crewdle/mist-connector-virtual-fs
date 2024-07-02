@@ -19,7 +19,7 @@ export class VirtualFSFile implements IFile {
    * @param storeKey - The store key to decrypt the file.
    * @param writeOptions - Represents the options for writing a file.
    */
-  constructor(public name: string, public path: string, public size: number, public type: string, private storeKey: string, private writeOptions: IFileOptions) {
+  constructor(public name: string, public path: string, public size: number, public type: string, private storeKey: string, private rootPath: string, private writeOptions: IFileOptions) {
     this.lastModified = fs.statSync(this.pathName).mtimeMs;
   }
 
@@ -27,7 +27,7 @@ export class VirtualFSFile implements IFile {
    * Gets the full path of the file.
    */
   get pathName(): string {
-    return `${this.path}/${this.name}`;
+    return `${this.rootPath}/${this.path}/${this.name}`;
   }
 
   /**
@@ -77,11 +77,9 @@ export class VirtualFSFile implements IFile {
 
   private getBuffer(): Buffer {
     let buffer: Buffer = fs.readFileSync(this.pathName);
-    if (!this.writeOptions.skipEncryption) {
+    if (!this.writeOptions?.skipEncryption) {
       buffer = decrypt(buffer, this.storeKey);
     }
     return buffer;
   }
 }
-
-

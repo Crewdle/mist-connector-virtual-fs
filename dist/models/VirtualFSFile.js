@@ -49,12 +49,13 @@ class VirtualFSFile {
      * @param storeKey - The store key to decrypt the file.
      * @param writeOptions - Represents the options for writing a file.
      */
-    constructor(name, path, size, type, storeKey, writeOptions) {
+    constructor(name, path, size, type, storeKey, rootPath, writeOptions) {
         this.name = name;
         this.path = path;
         this.size = size;
         this.type = type;
         this.storeKey = storeKey;
+        this.rootPath = rootPath;
         this.writeOptions = writeOptions;
         this.lastModified = fs.statSync(this.pathName).mtimeMs;
     }
@@ -62,7 +63,7 @@ class VirtualFSFile {
      * Gets the full path of the file.
      */
     get pathName() {
-        return `${this.path}/${this.name}`;
+        return `${this.rootPath}/${this.path}/${this.name}`;
     }
     /**
      * Returns a promise that resolves with the file content as an ArrayBuffer.
@@ -111,8 +112,9 @@ class VirtualFSFile {
         }
     }
     getBuffer() {
+        var _a;
         let buffer = fs.readFileSync(this.pathName);
-        if (!this.writeOptions.skipEncryption) {
+        if (!((_a = this.writeOptions) === null || _a === void 0 ? void 0 : _a.skipEncryption)) {
             buffer = (0, helpers_1.decrypt)(buffer, this.storeKey);
         }
         return buffer;

@@ -71,17 +71,10 @@ class VirtualFSObjectStoreConnector {
         return __awaiter(this, void 0, void 0, function* () {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
             const [folderPath, name] = (0, helpers_1.splitPathName)(path);
-            let buffer;
-            // const encrypted: Buffer = fs.readFileSync(internalPath);
-            // TODO should not decrypt llms
-            // const decrypted: Buffer = decrypt(encrypted, this.storeKey);
-            // const type = await fileTypeFromBuffer(decrypted);
             const stats = fs.statSync(internalPath);
             const size = stats.size;
             const type = mime_1.default.getType(internalPath) || 'application/octet-stream';
-            // Virtual FS needs to return something from which we can read content.
-            // It also needs to perform decryption when not skipping encryption.
-            return new VirtualFSFile_1.VirtualFSFile(name, path, size, type, this.storeKey, writeOptions);
+            return new VirtualFSFile_1.VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, writeOptions);
         });
     }
     /**
