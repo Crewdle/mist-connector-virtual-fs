@@ -19,9 +19,10 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
     /**
      * Get a file.
      * @param path The path.
+     * @param fileOptions The file options.
      * @returns A promise that resolves with the file.
      */
-    get(path: string, writeOptions: IFileOptions): Promise<IFile>;
+    get(path: string, fileOptions: IFileOptions): Promise<IFile>;
     /**
      * List the objects.
      * @param path The path.

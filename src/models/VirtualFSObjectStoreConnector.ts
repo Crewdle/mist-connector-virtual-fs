@@ -39,17 +39,18 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
   /**
    * Get a file.
    * @param path The path.
+   * @param fileOptions The file options.
    * @returns A promise that resolves with the file.
    */
   // TODO - Need to expose a virtual file handle to the client
-  async get(path: string, writeOptions: IFileOptions): Promise<IFile> {
+  async get(path: string, fileOptions: IFileOptions): Promise<IFile> {
     const internalPath = getPathName(this.rootPath, path);
     const [folderPath, name] = splitPathName(path);
     const stats = fs.statSync(internalPath);
     const size = stats.size;
     const type = mime.getType(internalPath) || 'application/octet-stream';
 
-    return new VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, writeOptions);
+    return new VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, fileOptions);
   }
 
   /**

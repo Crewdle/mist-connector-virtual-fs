@@ -45,7 +45,7 @@ export class VirtualFSFile implements IFile {
    */
   async text(): Promise<string> {
     const buffer = this.getBuffer();
-    return buffer.toString('utf-8');
+    return buffer.toString('utf8');
   }
 
   /**

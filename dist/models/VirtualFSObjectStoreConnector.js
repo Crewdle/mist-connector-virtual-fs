@@ -64,17 +64,18 @@ class VirtualFSObjectStoreConnector {
     /**
      * Get a file.
      * @param path The path.
+     * @param fileOptions The file options.
      * @returns A promise that resolves with the file.
      */
     // TODO - Need to expose a virtual file handle to the client
-    get(path, writeOptions) {
+    get(path, fileOptions) {
         return __awaiter(this, void 0, void 0, function* () {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
             const [folderPath, name] = (0, helpers_1.splitPathName)(path);
             const stats = fs.statSync(internalPath);
             const size = stats.size;
             const type = mime_1.default.getType(internalPath) || 'application/octet-stream';
-            return new VirtualFSFile_1.VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, writeOptions);
+            return new VirtualFSFile_1.VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, fileOptions);
         });
     }
     /**

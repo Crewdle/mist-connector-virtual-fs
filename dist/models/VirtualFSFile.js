@@ -82,7 +82,7 @@ class VirtualFSFile {
     text() {
         return __awaiter(this, void 0, void 0, function* () {
             const buffer = this.getBuffer();
-            return buffer.toString('utf-8');
+            return buffer.toString('utf8');
         });
     }
     /**
