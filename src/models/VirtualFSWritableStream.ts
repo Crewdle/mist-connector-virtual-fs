@@ -28,7 +28,7 @@ export class VirtualFSWritableStream implements IWritableStream {
         buffer = encrypt(buffer, this.storeKey);
       }
 
-      const writeResult = this.stream.write(buffer, (error) => {
+      this.stream.write(buffer, (error) => {
         if (error) {
           reject(error);
         } else {

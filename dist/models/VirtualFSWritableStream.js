@@ -38,7 +38,7 @@ class VirtualFSWritableStream {
                 if (!this.options.skipEncryption) {
                     buffer = (0, helpers_1.encrypt)(buffer, this.storeKey);
                 }
-                const writeResult = this.stream.write(buffer, (error) => {
+                this.stream.write(buffer, (error) => {
                     if (error) {
                         reject(error);
                     }
