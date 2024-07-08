@@ -28,7 +28,7 @@ export class VirtualFSWritableStream implements IWritableStream {
         buffer = encrypt(buffer, this.storeKey);
       }
 
-      this.stream.write(buffer, (error) => {
+      const writeResult = this.stream.write(buffer, (error) => {
         if (error) {
           reject(error);
         } else {
@@ -43,6 +43,12 @@ export class VirtualFSWritableStream implements IWritableStream {
    * @returns A promise that resolves when the stream is closed.
    */
   async close(): Promise<void> {
+    await this.waitForDrain();
+
+    if (this.stream.writableEnded) {
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       this.stream.on('error', (error) => {
         reject(error);
@@ -52,6 +58,18 @@ export class VirtualFSWritableStream implements IWritableStream {
         resolve();
         this.stream.destroy();
       });
+    });
+  }
+
+  private async waitForDrain(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.stream.writableNeedDrain) {
+        this.stream.once('drain', () => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
     });
   }
 }

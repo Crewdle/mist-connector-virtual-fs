@@ -25,4 +25,5 @@ export declare class VirtualFSWritableStream implements IWritableStream {
      * @returns A promise that resolves when the stream is closed.
      */
     close(): Promise<void>;
+    private waitForDrain;
 }

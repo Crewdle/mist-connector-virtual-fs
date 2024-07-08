@@ -38,7 +38,7 @@ class VirtualFSWritableStream {
                 if (!this.options.skipEncryption) {
                     buffer = (0, helpers_1.encrypt)(buffer, this.storeKey);
                 }
-                this.stream.write(buffer, (error) => {
+                const writeResult = this.stream.write(buffer, (error) => {
                     if (error) {
                         reject(error);
                     }
@@ -55,6 +55,10 @@ class VirtualFSWritableStream {
      */
     close() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.waitForDrain();
+            if (this.stream.writableEnded) {
+                return;
+            }
             return new Promise((resolve, reject) => {
                 this.stream.on('error', (error) => {
                     reject(error);
@@ -63,6 +67,20 @@ class VirtualFSWritableStream {
                     resolve();
                     this.stream.destroy();
                 });
+            });
+        });
+    }
+    waitForDrain() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => {
+                if (this.stream.writableNeedDrain) {
+                    this.stream.once('drain', () => {
+                        resolve();
+                    });
+                }
+                else {
+                    resolve();
+                }
             });
         });
     }
