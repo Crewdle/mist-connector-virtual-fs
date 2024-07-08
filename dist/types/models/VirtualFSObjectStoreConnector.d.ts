@@ -1,4 +1,4 @@
-import { IFileDescriptor, IFolderDescriptor, IObjectStoreConnector, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
+import { IFile, IFileDescriptor, IFileOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
 import { IVirtualFSObjectStoreOptions } from './VirtualFSObjectStoreOptions';
 /**
  * The virtual file system object store connector.
@@ -19,9 +19,10 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
     /**
      * Get a file.
      * @param path The path.
+     * @param options The file options.
      * @returns A promise that resolves with the file.
      */
-    get(path: string): Promise<File>;
+    get(path: string, options: IFileOptions): Promise<IFile>;
     /**
      * List the objects.
      * @param path The path.
@@ -39,9 +40,17 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * Write a file.
      * @param file The file.
      * @param path The path.
+     * @param options The file options.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file: File, path?: string | undefined, skipEncryption?: boolean): Promise<IFileDescriptor>;
+    writeFile(file: File, path?: string, { skipEncryption }?: IFileOptions): Promise<IFileDescriptor>;
+    /**
+     * Creates a writable stream for a file.
+     * @param path The path to the file.
+     * @param options The file options.
+     * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
+     */
+    createWritableStream(pathName: string, options?: IFileOptions): Promise<IWritableStream>;
     /**
      * Move an object.
      * @param path The path.
@@ -56,7 +65,7 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      */
     deleteObject(path: string): Promise<ObjectKind>;
     /**
-     * Calculate the size of an object.
+     * Calculate the size of an object and its children at the given path.
      * @param path The path.
      * @returns A promise that resolves with the size of the object.
      */

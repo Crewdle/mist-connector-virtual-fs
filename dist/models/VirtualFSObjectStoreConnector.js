@@ -31,12 +31,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualFSObjectStoreConnector = void 0;
 const fs = __importStar(require("fs"));
-const file_type_1 = require("file-type");
+const mime_1 = __importDefault(require("mime"));
 const web_sdk_types_1 = require("@crewdle/web-sdk-types");
 const helpers_1 = require("../helpers");
+const VirtualFSWritableStream_1 = require("./VirtualFSWritableStream");
+const VirtualFSFile_1 = require("./VirtualFSFile");
 global.File = helpers_1.FilePolyfill;
 /**
  * The virtual file system object store connector.
@@ -59,17 +64,17 @@ class VirtualFSObjectStoreConnector {
     /**
      * Get a file.
      * @param path The path.
+     * @param options The file options.
      * @returns A promise that resolves with the file.
      */
-    get(path) {
+    get(path, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
-            const encrypted = fs.readFileSync(internalPath);
-            const decrypted = (0, helpers_1.decrypt)(encrypted, this.storeKey);
-            const type = yield (0, file_type_1.fileTypeFromBuffer)(decrypted);
-            const file = new File([decrypted], path, { type: (_a = type === null || type === void 0 ? void 0 : type.mime) !== null && _a !== void 0 ? _a : 'application/octet-stream' });
-            return file;
+            const [folderPath, name] = (0, helpers_1.splitPathName)(path);
+            const stats = fs.statSync(internalPath);
+            const size = stats.size;
+            const type = mime_1.default.getType(internalPath) || 'application/octet-stream';
+            return new VirtualFSFile_1.VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, options);
         });
     }
     /**
@@ -135,10 +140,11 @@ class VirtualFSObjectStoreConnector {
      * Write a file.
      * @param file The file.
      * @param path The path.
+     * @param options The file options.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file, path, skipEncryption) {
-        return __awaiter(this, void 0, void 0, function* () {
+    writeFile(file_1, path_1) {
+        return __awaiter(this, arguments, void 0, function* (file, path, { skipEncryption } = {}) {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
             let fileBuffer = Buffer.from(yield file.arrayBuffer());
             if (!skipEncryption) {
@@ -158,6 +164,24 @@ class VirtualFSObjectStoreConnector {
                 size: file.size,
                 status: web_sdk_types_1.FileStatus.Synced,
             };
+        });
+    }
+    /**
+     * Creates a writable stream for a file.
+     * @param path The path to the file.
+     * @param options The file options.
+     * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
+     */
+    createWritableStream(pathName_1) {
+        return __awaiter(this, arguments, void 0, function* (pathName, options = {}) {
+            const [path, name] = (0, helpers_1.splitPathName)(pathName);
+            const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
+            if (!fs.existsSync(internalPath)) {
+                fs.mkdirSync(internalPath, { recursive: true });
+            }
+            const internalPathName = (0, helpers_1.getPathName)(internalPath, name);
+            const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
+            return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable, options, this.storeKey);
         });
     }
     /**
@@ -199,7 +223,7 @@ class VirtualFSObjectStoreConnector {
         });
     }
     /**
-     * Calculate the size of an object.
+     * Calculate the size of an object and its children at the given path.
      * @param path The path.
      * @returns A promise that resolves with the size of the object.
      */

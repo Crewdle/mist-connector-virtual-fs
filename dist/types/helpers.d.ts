@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Blob, BlobOptions } from 'buffer';
 /**
  * Encrypt a buffer with a key
