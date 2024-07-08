@@ -22,12 +22,12 @@
     "dist/"
   ],
   "dependencies": {
-    "file-type": "^19.0.0",
-    "mime": "^4.0.3"
+    "file-type": "^19.1.0",
+    "mime": "^4.0.4"
   },
   "devDependencies": {
-    "@crewdle/web-sdk-types": "^1.0.12",
-    "@types/node": "^20.11.27",
-    "typescript": "^5.4.2"
+    "@crewdle/web-sdk-types": "^1.0.17",
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
   }
 }

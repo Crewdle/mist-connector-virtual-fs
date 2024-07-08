@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VirtualFSObjectStoreConnector = exports.getVirtualFSObjectStoreConnector = void 0;
+exports.VirtualFSObjectStoreConnector = void 0;
+exports.getVirtualFSObjectStoreConnector = getVirtualFSObjectStoreConnector;
 const VirtualFSObjectStoreConnector_1 = require("./models/VirtualFSObjectStoreConnector");
 Object.defineProperty(exports, "VirtualFSObjectStoreConnector", { enumerable: true, get: function () { return VirtualFSObjectStoreConnector_1.VirtualFSObjectStoreConnector; } });
 /**
@@ -18,4 +19,3 @@ function getVirtualFSObjectStoreConnector(options) {
         }
     };
 }
-exports.getVirtualFSObjectStoreConnector = getVirtualFSObjectStoreConnector;
