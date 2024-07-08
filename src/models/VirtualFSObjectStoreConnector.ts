@@ -39,18 +39,17 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
   /**
    * Get a file.
    * @param path The path.
-   * @param fileOptions The file options.
+   * @param options The file options.
    * @returns A promise that resolves with the file.
    */
-  // TODO - Need to expose a virtual file handle to the client
-  async get(path: string, fileOptions: IFileOptions): Promise<IFile> {
+  async get(path: string, options: IFileOptions): Promise<IFile> {
     const internalPath = getPathName(this.rootPath, path);
     const [folderPath, name] = splitPathName(path);
     const stats = fs.statSync(internalPath);
     const size = stats.size;
     const type = mime.getType(internalPath) || 'application/octet-stream';
 
-    return new VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, fileOptions);
+    return new VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, options);
   }
 
   /**
@@ -118,6 +117,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * Write a file.
    * @param file The file.
    * @param path The path.
+   * @param options The file options.
    * @returns A promise that resolves when the file is written.
    */
   async writeFile(file: File, path?: string, { skipEncryption }: IFileOptions = {}): Promise<IFileDescriptor> {
@@ -146,9 +146,10 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
   /**
    * Creates a writable stream for a file.
    * @param path The path to the file.
+   * @param options The file options.
    * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
    */
-  async createWritableStream(pathName: string, writeOptions: IFileOptions = {}): Promise<IWritableStream> {
+  async createWritableStream(pathName: string, options: IFileOptions = {}): Promise<IWritableStream> {
     const [path, name] = splitPathName(pathName);
     const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
     if (!fs.existsSync(internalPath)) {
@@ -158,7 +159,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     const internalPathName = getPathName(internalPath, name);
     const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
 
-    return new VirtualFSWritableStream(writable, writeOptions, this.storeKey);
+    return new VirtualFSWritableStream(writable, options, this.storeKey);
   }
 
   /**

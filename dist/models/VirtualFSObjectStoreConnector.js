@@ -64,18 +64,17 @@ class VirtualFSObjectStoreConnector {
     /**
      * Get a file.
      * @param path The path.
-     * @param fileOptions The file options.
+     * @param options The file options.
      * @returns A promise that resolves with the file.
      */
-    // TODO - Need to expose a virtual file handle to the client
-    get(path, fileOptions) {
+    get(path, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path);
             const [folderPath, name] = (0, helpers_1.splitPathName)(path);
             const stats = fs.statSync(internalPath);
             const size = stats.size;
             const type = mime_1.default.getType(internalPath) || 'application/octet-stream';
-            return new VirtualFSFile_1.VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, fileOptions);
+            return new VirtualFSFile_1.VirtualFSFile(name, folderPath, size, type, this.storeKey, this.rootPath, options);
         });
     }
     /**
@@ -141,6 +140,7 @@ class VirtualFSObjectStoreConnector {
      * Write a file.
      * @param file The file.
      * @param path The path.
+     * @param options The file options.
      * @returns A promise that resolves when the file is written.
      */
     writeFile(file_1, path_1) {
@@ -169,10 +169,11 @@ class VirtualFSObjectStoreConnector {
     /**
      * Creates a writable stream for a file.
      * @param path The path to the file.
+     * @param options The file options.
      * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
      */
     createWritableStream(pathName_1) {
-        return __awaiter(this, arguments, void 0, function* (pathName, writeOptions = {}) {
+        return __awaiter(this, arguments, void 0, function* (pathName, options = {}) {
             const [path, name] = (0, helpers_1.splitPathName)(pathName);
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
             if (!fs.existsSync(internalPath)) {
@@ -180,7 +181,7 @@ class VirtualFSObjectStoreConnector {
             }
             const internalPathName = (0, helpers_1.getPathName)(internalPath, name);
             const writable = fs.createWriteStream(internalPathName, { flags: 'a' });
-            return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable, writeOptions, this.storeKey);
+            return new VirtualFSWritableStream_1.VirtualFSWritableStream(writable, options, this.storeKey);
         });
     }
     /**

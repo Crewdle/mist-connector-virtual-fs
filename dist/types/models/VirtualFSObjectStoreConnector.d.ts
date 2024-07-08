@@ -19,10 +19,10 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
     /**
      * Get a file.
      * @param path The path.
-     * @param fileOptions The file options.
+     * @param options The file options.
      * @returns A promise that resolves with the file.
      */
-    get(path: string, fileOptions: IFileOptions): Promise<IFile>;
+    get(path: string, options: IFileOptions): Promise<IFile>;
     /**
      * List the objects.
      * @param path The path.
@@ -40,15 +40,17 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * Write a file.
      * @param file The file.
      * @param path The path.
+     * @param options The file options.
      * @returns A promise that resolves when the file is written.
      */
     writeFile(file: File, path?: string, { skipEncryption }?: IFileOptions): Promise<IFileDescriptor>;
     /**
      * Creates a writable stream for a file.
      * @param path The path to the file.
+     * @param options The file options.
      * @returns A promise that resolves with an {@link IWritableStream | IWritableStream }.
      */
-    createWritableStream(pathName: string, writeOptions?: IFileOptions): Promise<IWritableStream>;
+    createWritableStream(pathName: string, options?: IFileOptions): Promise<IWritableStream>;
     /**
      * Move an object.
      * @param path The path.

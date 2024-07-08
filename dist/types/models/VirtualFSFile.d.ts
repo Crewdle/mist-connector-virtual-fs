@@ -9,7 +9,7 @@ export declare class VirtualFSFile implements IFile {
     type: string;
     private storeKey;
     private rootPath;
-    private writeOptions;
+    private options;
     lastModified: number;
     /**
      * Creates a new instance of the VirtualFSFile class.
@@ -18,9 +18,9 @@ export declare class VirtualFSFile implements IFile {
      * @param size - The size of the file in bytes.
      * @param type - The type of the file.
      * @param storeKey - The store key to decrypt the file.
-     * @param writeOptions - Represents the options for writing a file.
+     * @param options - Represents the options for reading or writing a file.
      */
-    constructor(name: string, path: string, size: number, type: string, storeKey: string, rootPath: string, writeOptions: IFileOptions);
+    constructor(name: string, path: string, size: number, type: string, storeKey: string, rootPath: string, options: IFileOptions);
     /**
      * Gets the full path of the file.
      */

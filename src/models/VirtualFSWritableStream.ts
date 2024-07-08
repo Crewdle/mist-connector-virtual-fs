@@ -10,8 +10,10 @@ export class VirtualFSWritableStream implements IWritableStream {
   /**
    * Creates a writable stream for a file.
    * @param stream The write stream to be used.
+   * @param options The options for the file.
+   * @param storeKey The store key to encrypt the file.
    */
-  constructor(private stream: fs.WriteStream, private writeOptions: IFileOptions, private storeKey: string) {}
+  constructor(private stream: fs.WriteStream, private options: IFileOptions, private storeKey: string) {}
 
   /**
    * Writes a chunk of data to the stream.
@@ -22,7 +24,7 @@ export class VirtualFSWritableStream implements IWritableStream {
     return new Promise((resolve, reject) => {
       let buffer = Buffer.from(chunk);
 
-      if (!this.writeOptions.skipEncryption) {
+      if (!this.options.skipEncryption) {
         buffer = encrypt(buffer, this.storeKey);
       }
 

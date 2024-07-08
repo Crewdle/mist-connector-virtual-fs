@@ -18,10 +18,12 @@ class VirtualFSWritableStream {
     /**
      * Creates a writable stream for a file.
      * @param stream The write stream to be used.
+     * @param options The options for the file.
+     * @param storeKey The store key to encrypt the file.
      */
-    constructor(stream, writeOptions, storeKey) {
+    constructor(stream, options, storeKey) {
         this.stream = stream;
-        this.writeOptions = writeOptions;
+        this.options = options;
         this.storeKey = storeKey;
     }
     /**
@@ -33,7 +35,7 @@ class VirtualFSWritableStream {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 let buffer = Buffer.from(chunk);
-                if (!this.writeOptions.skipEncryption) {
+                if (!this.options.skipEncryption) {
                     buffer = (0, helpers_1.encrypt)(buffer, this.storeKey);
                 }
                 this.stream.write(buffer, (error) => {

@@ -22,7 +22,6 @@
     "dist/"
   ],
   "dependencies": {
-    "file-type": "^19.1.0",
     "mime": "^4.0.4"
   },
   "devDependencies": {
