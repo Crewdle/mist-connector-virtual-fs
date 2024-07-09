@@ -6,6 +6,10 @@ import { encrypt } from '../helpers';
  * Represents a writable stream for a file.
  */
 export class VirtualFSWritableStream implements IWritableStream {
+  /**
+   * The chunks of data to write when encryption is enabled.
+   */
+  private chunks: ArrayBuffer[] = [];
 
   /**
    * Creates a writable stream for a file.
@@ -21,12 +25,13 @@ export class VirtualFSWritableStream implements IWritableStream {
    * @returns A promise that resolves when the write operation is complete.
    */
   async write(chunk: ArrayBuffer): Promise<void> {
+    if (!this.options.skipEncryption) {
+      this.chunks.push(chunk);
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       let buffer = Buffer.from(chunk);
-
-      if (!this.options.skipEncryption) {
-        buffer = encrypt(buffer, this.storeKey);
-      }
 
       this.stream.write(buffer, (error) => {
         if (error) {
@@ -43,6 +48,12 @@ export class VirtualFSWritableStream implements IWritableStream {
    * @returns A promise that resolves when the stream is closed.
    */
   async close(): Promise<void> {
+    if (!this.options.skipEncryption) {
+      const buffer = Buffer.concat(this.chunks.map((chunk) => Buffer.from(chunk)));
+      const encryptedBuffer = encrypt(buffer, this.storeKey);
+      this.stream.write(encryptedBuffer);
+    }
+
     await this.waitForDrain();
 
     if (this.stream.writableEnded) {

@@ -27,8 +27,8 @@ export function encrypt(buffer: Buffer, key: string): Buffer {
  */
 export function decrypt(encrypted: Buffer, key: string): Buffer {
   const hashedKey = crypto.createHash('sha256').update(key).digest();
-  const iv: Buffer = encrypted.slice(0, 16);
-  const data: Buffer = encrypted.slice(16);
+  const iv: Buffer = encrypted.subarray(0, 16);
+  const data: Buffer = encrypted.subarray(16);
   const decipher: crypto.Decipher = crypto.createDecipheriv(algorithm, hashedKey, iv);
   return Buffer.concat([decipher.update(data), decipher.final()]);
 }

@@ -9,6 +9,7 @@ import { decrypt } from '../helpers';
  */
 export class VirtualFSFile implements IFile {
   lastModified: number;
+  private _size: number;
 
   /**
    * Creates a new instance of the VirtualFSFile class.
@@ -19,7 +20,8 @@ export class VirtualFSFile implements IFile {
    * @param storeKey - The store key to decrypt the file.
    * @param options - Represents the options for reading or writing a file.
    */
-  constructor(public name: string, public path: string, public size: number, public type: string, private storeKey: string, private rootPath: string, private options: IFileOptions) {
+  constructor(public name: string, public path: string, size: number, public type: string, private storeKey: string, private rootPath: string, private options: IFileOptions) {
+    this._size = size;
     this.lastModified = fs.statSync(this.pathName).mtimeMs;
   }
 
@@ -28,6 +30,17 @@ export class VirtualFSFile implements IFile {
    */
   get pathName(): string {
     return `${this.rootPath}/${this.path}/${this.name}`;
+  }
+
+  /**
+   * Gets the size of the file in bytes.
+   */
+  get size(): number {
+    if (!this.options?.skipEncryption) {
+      return this.getBuffer().length;
+    }
+
+    return this._size;
   }
 
   /**
@@ -53,6 +66,11 @@ export class VirtualFSFile implements IFile {
    * @returns A readable stream for the file content.
    */
   stream(): IReadableStream {
+    if (!this.options?.skipEncryption) {
+      // TODO Add support for streaming encrypted files
+      throw new Error('Cannot stream encrypted files');
+    }
+
     const readStream = fs.createReadStream(this.pathName);
     return new VirtualFSReadableStream(readStream);
   }
@@ -65,6 +83,10 @@ export class VirtualFSFile implements IFile {
    * @returns A new Blob object that contains a portion of the file content.
    */
   slice(start?: number, end?: number, contentType?: string): Blob {
+    if (!this.options?.skipEncryption) {
+      return new Blob([this.getBuffer().subarray(start, end)], { type: contentType });
+    }
+
     const fd = fs.openSync(this.pathName, 'r');
     try {
       const buffer = Buffer.alloc((end || this.size) - (start || 0));

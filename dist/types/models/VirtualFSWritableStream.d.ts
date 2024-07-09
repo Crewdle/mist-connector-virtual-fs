@@ -8,6 +8,10 @@ export declare class VirtualFSWritableStream implements IWritableStream {
     private options;
     private storeKey;
     /**
+     * The chunks of data to write when encryption is enabled.
+     */
+    private chunks;
+    /**
      * Creates a writable stream for a file.
      * @param stream The write stream to be used.
      * @param options The options for the file.

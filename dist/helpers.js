@@ -54,8 +54,8 @@ function encrypt(buffer, key) {
  */
 function decrypt(encrypted, key) {
     const hashedKey = crypto.createHash('sha256').update(key).digest();
-    const iv = encrypted.slice(0, 16);
-    const data = encrypted.slice(16);
+    const iv = encrypted.subarray(0, 16);
+    const data = encrypted.subarray(16);
     const decipher = crypto.createDecipheriv(algorithm, hashedKey, iv);
     return Buffer.concat([decipher.update(data), decipher.final()]);
 }

@@ -52,11 +52,11 @@ class VirtualFSFile {
     constructor(name, path, size, type, storeKey, rootPath, options) {
         this.name = name;
         this.path = path;
-        this.size = size;
         this.type = type;
         this.storeKey = storeKey;
         this.rootPath = rootPath;
         this.options = options;
+        this._size = size;
         this.lastModified = fs.statSync(this.pathName).mtimeMs;
     }
     /**
@@ -64,6 +64,16 @@ class VirtualFSFile {
      */
     get pathName() {
         return `${this.rootPath}/${this.path}/${this.name}`;
+    }
+    /**
+     * Gets the size of the file in bytes.
+     */
+    get size() {
+        var _a;
+        if (!((_a = this.options) === null || _a === void 0 ? void 0 : _a.skipEncryption)) {
+            return this.getBuffer().length;
+        }
+        return this._size;
     }
     /**
      * Returns a promise that resolves with the file content as an ArrayBuffer.
@@ -90,6 +100,11 @@ class VirtualFSFile {
      * @returns A readable stream for the file content.
      */
     stream() {
+        var _a;
+        if (!((_a = this.options) === null || _a === void 0 ? void 0 : _a.skipEncryption)) {
+            // TODO Add support for streaming encrypted files
+            throw new Error('Cannot stream encrypted files');
+        }
         const readStream = fs.createReadStream(this.pathName);
         return new VirtualFSReadableStream_1.VirtualFSReadableStream(readStream);
     }
@@ -101,6 +116,10 @@ class VirtualFSFile {
      * @returns A new Blob object that contains a portion of the file content.
      */
     slice(start, end, contentType) {
+        var _a;
+        if (!((_a = this.options) === null || _a === void 0 ? void 0 : _a.skipEncryption)) {
+            return new Blob([this.getBuffer().subarray(start, end)], { type: contentType });
+        }
         const fd = fs.openSync(this.pathName, 'r');
         try {
             const buffer = Buffer.alloc((end || this.size) - (start || 0));
