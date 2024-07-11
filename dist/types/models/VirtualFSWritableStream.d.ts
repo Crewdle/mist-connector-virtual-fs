@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import * as fs from 'fs';
 import { IFileOptions, IWritableStream } from "@crewdle/web-sdk-types";
 /**

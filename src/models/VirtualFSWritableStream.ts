@@ -48,6 +48,10 @@ export class VirtualFSWritableStream implements IWritableStream {
    * @returns A promise that resolves when the stream is closed.
    */
   async close(): Promise<void> {
+    if (this.stream.writableEnded) {
+      return;
+    }
+
     if (!this.options.skipEncryption) {
       const buffer = Buffer.concat(this.chunks.map((chunk) => Buffer.from(chunk)));
       const encryptedBuffer = encrypt(buffer, this.storeKey);
@@ -55,10 +59,6 @@ export class VirtualFSWritableStream implements IWritableStream {
     }
 
     await this.waitForDrain();
-
-    if (this.stream.writableEnded) {
-      return;
-    }
 
     return new Promise((resolve, reject) => {
       this.stream.on('error', (error) => {
