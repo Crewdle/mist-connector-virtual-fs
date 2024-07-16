@@ -25,6 +25,10 @@ class VirtualFSWritableStream {
         this.stream = stream;
         this.options = options;
         this.storeKey = storeKey;
+        /**
+         * The chunks of data to write when encryption is enabled.
+         */
+        this.chunks = [];
     }
     /**
      * Writes a chunk of data to the stream.
@@ -33,11 +37,12 @@ class VirtualFSWritableStream {
      */
     write(chunk) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.options.skipEncryption) {
+                this.chunks.push(chunk);
+                return;
+            }
             return new Promise((resolve, reject) => {
                 let buffer = Buffer.from(chunk);
-                if (!this.options.skipEncryption) {
-                    buffer = (0, helpers_1.encrypt)(buffer, this.storeKey);
-                }
                 this.stream.write(buffer, (error) => {
                     if (error) {
                         reject(error);
@@ -55,10 +60,16 @@ class VirtualFSWritableStream {
      */
     close() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.waitForDrain();
             if (this.stream.writableEnded) {
                 return;
             }
+            console.log('closing stream');
+            if (!this.options.skipEncryption) {
+                const buffer = Buffer.concat(this.chunks.map((chunk) => Buffer.from(chunk)));
+                const encryptedBuffer = (0, helpers_1.encrypt)(buffer, this.storeKey);
+                this.stream.write(encryptedBuffer);
+            }
+            yield this.waitForDrain();
             return new Promise((resolve, reject) => {
                 this.stream.on('error', (error) => {
                     reject(error);

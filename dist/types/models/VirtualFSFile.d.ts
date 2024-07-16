@@ -5,12 +5,12 @@ import { IFile, IFileOptions, IReadableStream } from '@crewdle/web-sdk-types';
 export declare class VirtualFSFile implements IFile {
     name: string;
     path: string;
-    size: number;
     type: string;
     private storeKey;
     private rootPath;
     private options;
     lastModified: number;
+    private _size;
     /**
      * Creates a new instance of the VirtualFSFile class.
      * @param name - The name of the file.
@@ -25,6 +25,10 @@ export declare class VirtualFSFile implements IFile {
      * Gets the full path of the file.
      */
     get pathName(): string;
+    /**
+     * Gets the size of the file in bytes.
+     */
+    get size(): number;
     /**
      * Returns a promise that resolves with the file content as an ArrayBuffer.
      * @returns A promise that resolves with the file content as an ArrayBuffer.
