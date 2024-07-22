@@ -63,7 +63,6 @@ class VirtualFSWritableStream {
             if (this.stream.writableEnded) {
                 return;
             }
-            console.log('closing stream');
             if (!this.options.skipEncryption) {
                 const buffer = Buffer.concat(this.chunks.map((chunk) => Buffer.from(chunk)));
                 const encryptedBuffer = (0, helpers_1.encrypt)(buffer, this.storeKey);

@@ -22,10 +22,12 @@
     "dist/"
   ],
   "dependencies": {
+    "follow-redirects": "^1.15.6",
     "mime": "^4.0.4"
   },
   "devDependencies": {
     "@crewdle/web-sdk-types": "^1.0.17",
+    "@types/follow-redirects": "^1.14.4",
     "@types/node": "^20.14.10",
     "typescript": "^5.5.3"
   }

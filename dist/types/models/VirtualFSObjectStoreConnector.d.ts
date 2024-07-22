@@ -43,7 +43,7 @@ export declare class VirtualFSObjectStoreConnector implements IObjectStoreConnec
      * @param options The file options.
      * @returns A promise that resolves when the file is written.
      */
-    writeFile(file: File, path?: string, { skipEncryption }?: IFileOptions): Promise<IFileDescriptor>;
+    writeFile(file: File, path?: string, { skipEncryption, fetchUrl }?: IFileOptions): Promise<IFileDescriptor>;
     /**
      * Creates a writable stream for a file.
      * @param path The path to the file.

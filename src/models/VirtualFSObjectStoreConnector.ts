@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import https from 'follow-redirects/https';
 import mime from 'mime';
 
 import { FileStatus, IFile, IFileDescriptor, IFileOptions, IFolderDescriptor, IObjectStoreConnector, IWritableStream, ObjectDescriptor, ObjectKind } from '@crewdle/web-sdk-types';
@@ -120,25 +121,50 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
    * @param options The file options.
    * @returns A promise that resolves when the file is written.
    */
-  async writeFile(file: File, path?: string, { skipEncryption }: IFileOptions = {}): Promise<IFileDescriptor> {
+  async writeFile(file: File, path?: string, { skipEncryption, fetchUrl }: IFileOptions = {}): Promise<IFileDescriptor> {
     const internalPath = getPathName(this.rootPath, path === '/' ? '' : path ?? '');
-    let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
-    if (!skipEncryption) {
-      fileBuffer = encrypt(fileBuffer, this.storeKey);
+    let size = 0;
+    let type = 'application/octet-stream';
+
+    if (fetchUrl) {
+      await new Promise<void>((resolve, reject) => {
+        const fileStream = fs.createWriteStream(getPathName(internalPath, file.name));
+        https.get(fetchUrl, (response) => {
+          response.pipe(fileStream);
+    
+          fileStream.on('finish', () => {
+            size = fileStream.bytesWritten;
+            fileStream.close(() => {
+              resolve();
+            });
+          });
+        }).on('error', (err) => {
+          fs.unlink('', () => {}); // Delete the file async if there's an error
+          console.error(`Error downloading the file: ${err.message}`);
+          reject(err);
+        });
+      });
+    } else {
+      let fileBuffer: Buffer = Buffer.from(await file.arrayBuffer());
+      if (!skipEncryption) {
+        fileBuffer = encrypt(fileBuffer, this.storeKey);
+      }
+      if (!fs.existsSync(internalPath)) {
+        fs.mkdirSync(internalPath, { recursive: true });
+      }
+      fs.writeFileSync(getPathName(internalPath, file.name), fileBuffer);
+      size = file.size;
+      type = file.type;
     }
-    if (!fs.existsSync(internalPath)) {
-      fs.mkdirSync(internalPath, { recursive: true });
-    }
-    fs.writeFileSync(getPathName(internalPath, file.name), fileBuffer);
 
     return {
       kind: ObjectKind.File,
       name: file.name,
       path: path || '/',
       pathName: getPathName(path || '/', file.name),
-      absolutePathName: internalPath,
-      type: file.type,
-      size: file.size,
+      absolutePathName: getPathName(internalPath, file.name),
+      type: type,
+      size: size,
       status: FileStatus.Synced,
     };
   }
