@@ -150,7 +150,6 @@ class VirtualFSObjectStoreConnector {
             let size = 0;
             let type = 'application/octet-stream';
             if (fetchUrl) {
-                console.log(`Downloading the file from ${fetchUrl}...`);
                 yield new Promise((resolve, reject) => {
                     const fileStream = fs.createWriteStream((0, helpers_1.getPathName)(internalPath, file.name));
                     https_1.default.get(fetchUrl, (response) => {
@@ -158,7 +157,6 @@ class VirtualFSObjectStoreConnector {
                         fileStream.on('finish', () => {
                             size = fileStream.bytesWritten;
                             fileStream.close(() => {
-                                console.log('Download completed!');
                                 resolve();
                             });
                         });
@@ -187,8 +185,8 @@ class VirtualFSObjectStoreConnector {
                 path: path || '/',
                 pathName: (0, helpers_1.getPathName)(path || '/', file.name),
                 absolutePathName: (0, helpers_1.getPathName)(internalPath, file.name),
-                type: type,
-                size: size,
+                type,
+                size,
                 status: web_sdk_types_1.FileStatus.Synced,
             };
         });

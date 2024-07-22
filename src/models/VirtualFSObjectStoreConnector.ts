@@ -163,8 +163,8 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
       path: path || '/',
       pathName: getPathName(path || '/', file.name),
       absolutePathName: getPathName(internalPath, file.name),
-      type: type,
-      size: size,
+      type,
+      size,
       status: FileStatus.Synced,
     };
   }
