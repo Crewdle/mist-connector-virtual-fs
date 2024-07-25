@@ -139,7 +139,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
             });
           });
         }).on('error', (err) => {
-          fs.unlink('', () => {}); // Delete the file async if there's an error
+          fs.unlink(getPathName(internalPath, file.name), () => {});
           console.error(`Error downloading the file: ${err.message}`);
           reject(err);
         });
