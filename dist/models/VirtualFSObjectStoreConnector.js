@@ -161,7 +161,7 @@ class VirtualFSObjectStoreConnector {
                             });
                         });
                     }).on('error', (err) => {
-                        fs.unlink('', () => { }); // Delete the file async if there's an error
+                        fs.unlink((0, helpers_1.getPathName)(internalPath, file.name), () => { });
                         console.error(`Error downloading the file: ${err.message}`);
                         reject(err);
                     });
