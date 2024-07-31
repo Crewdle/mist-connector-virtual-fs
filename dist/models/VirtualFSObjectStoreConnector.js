@@ -90,15 +90,16 @@ class VirtualFSObjectStoreConnector {
             const objects = fs.readdirSync(internalPath);
             const descriptors = [];
             for (const object of objects) {
-                const stats = fs.statSync(`${internalPath}/${object}`);
+                const internalPathName = (0, helpers_1.getPathName)(internalPath, object);
                 const pathName = (0, helpers_1.getPathName)(path, object);
+                const stats = fs.statSync(internalPathName);
                 if (stats.isDirectory()) {
                     descriptors.push({
                         kind: web_sdk_types_1.ObjectKind.Folder,
                         name: object,
                         path: path,
                         pathName: pathName,
-                        absolutePathName: `${internalPath}/${object}`,
+                        absolutePathName: internalPathName,
                         entries: recursive ? yield this.list(pathName, recursive) : [],
                     });
                 }
@@ -108,7 +109,7 @@ class VirtualFSObjectStoreConnector {
                         name: object,
                         path: path,
                         pathName: pathName,
-                        absolutePathName: `${internalPath}/${object}`,
+                        absolutePathName: internalPathName,
                         type: 'application/octet-stream',
                         size: stats.size,
                         status: web_sdk_types_1.FileStatus.Synced,

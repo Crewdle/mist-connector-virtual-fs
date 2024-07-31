@@ -66,15 +66,16 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
     const descriptors: ObjectDescriptor[] = [];
 
     for (const object of objects) {
-      const stats = fs.statSync(`${internalPath}/${object}`);
+      const internalPathName = getPathName(internalPath, object);
       const pathName = getPathName(path, object);
+      const stats = fs.statSync(internalPathName);
       if (stats.isDirectory()) {
         descriptors.push({
           kind: ObjectKind.Folder,
           name: object,
           path: path,
           pathName: pathName,
-          absolutePathName: `${internalPath}/${object}`,
+          absolutePathName: internalPathName,
           entries: recursive ? await this.list(pathName, recursive) : [],
         });
       } else {
@@ -83,7 +84,7 @@ export class VirtualFSObjectStoreConnector implements IObjectStoreConnector {
           name: object,
           path: path,
           pathName: pathName,
-          absolutePathName: `${internalPath}/${object}`,
+          absolutePathName: internalPathName,
           type: 'application/octet-stream',
           size: stats.size,
           status: FileStatus.Synced,

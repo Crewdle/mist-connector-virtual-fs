@@ -41,7 +41,7 @@ export function decrypt(encrypted: Buffer, key: string): Buffer {
  * @ignore
  */
 export function getPathName(path: string, name: string): string {
-  return path === '/' ? path + name : path + '/' + name;
+  return '/' + getPathParts(path === '/' ? path + name : path + '/' + name).join('/');
 }
 
 /**

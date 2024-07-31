@@ -67,7 +67,7 @@ function decrypt(encrypted, key) {
  * @ignore
  */
 function getPathName(path, name) {
-    return path === '/' ? path + name : path + '/' + name;
+    return '/' + getPathParts(path === '/' ? path + name : path + '/' + name).join('/');
 }
 /**
  * Split a path name into its path and name
