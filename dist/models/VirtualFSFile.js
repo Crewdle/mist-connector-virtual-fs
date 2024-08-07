@@ -132,11 +132,14 @@ class VirtualFSFile {
     }
     getBuffer() {
         var _a;
-        let buffer = fs.readFileSync(this.pathName);
-        if (!((_a = this.options) === null || _a === void 0 ? void 0 : _a.skipEncryption)) {
-            buffer = (0, helpers_1.decrypt)(buffer, this.storeKey);
+        if (this._buffer) {
+            return this._buffer;
         }
-        return buffer;
+        this._buffer = fs.readFileSync(this.pathName);
+        if (!((_a = this.options) === null || _a === void 0 ? void 0 : _a.skipEncryption)) {
+            this._buffer = (0, helpers_1.decrypt)(this._buffer, this.storeKey);
+        }
+        return this._buffer;
     }
 }
 exports.VirtualFSFile = VirtualFSFile;

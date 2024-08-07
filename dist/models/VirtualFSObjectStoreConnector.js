@@ -37,6 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualFSObjectStoreConnector = void 0;
 const fs = __importStar(require("fs"));
+const https_1 = __importDefault(require("follow-redirects/https"));
 const mime_1 = __importDefault(require("mime"));
 const web_sdk_types_1 = require("@crewdle/web-sdk-types");
 const helpers_1 = require("../helpers");
@@ -89,15 +90,16 @@ class VirtualFSObjectStoreConnector {
             const objects = fs.readdirSync(internalPath);
             const descriptors = [];
             for (const object of objects) {
-                const stats = fs.statSync(`${internalPath}/${object}`);
+                const internalPathName = (0, helpers_1.getPathName)(internalPath, object);
                 const pathName = (0, helpers_1.getPathName)(path, object);
+                const stats = fs.statSync(internalPathName);
                 if (stats.isDirectory()) {
                     descriptors.push({
                         kind: web_sdk_types_1.ObjectKind.Folder,
                         name: object,
                         path: path,
                         pathName: pathName,
-                        absolutePathName: `${internalPath}/${object}`,
+                        absolutePathName: internalPathName,
                         entries: recursive ? yield this.list(pathName, recursive) : [],
                     });
                 }
@@ -107,7 +109,7 @@ class VirtualFSObjectStoreConnector {
                         name: object,
                         path: path,
                         pathName: pathName,
-                        absolutePathName: `${internalPath}/${object}`,
+                        absolutePathName: internalPathName,
                         type: 'application/octet-stream',
                         size: stats.size,
                         status: web_sdk_types_1.FileStatus.Synced,
@@ -144,24 +146,48 @@ class VirtualFSObjectStoreConnector {
      * @returns A promise that resolves when the file is written.
      */
     writeFile(file_1, path_1) {
-        return __awaiter(this, arguments, void 0, function* (file, path, { skipEncryption } = {}) {
+        return __awaiter(this, arguments, void 0, function* (file, path, { skipEncryption, fetchUrl } = {}) {
             const internalPath = (0, helpers_1.getPathName)(this.rootPath, path === '/' ? '' : path !== null && path !== void 0 ? path : '');
-            let fileBuffer = Buffer.from(yield file.arrayBuffer());
-            if (!skipEncryption) {
-                fileBuffer = (0, helpers_1.encrypt)(fileBuffer, this.storeKey);
+            let size = 0;
+            let type = 'application/octet-stream';
+            if (fetchUrl) {
+                yield new Promise((resolve, reject) => {
+                    const fileStream = fs.createWriteStream((0, helpers_1.getPathName)(internalPath, file.name));
+                    https_1.default.get(fetchUrl, (response) => {
+                        response.pipe(fileStream);
+                        fileStream.on('finish', () => {
+                            size = fileStream.bytesWritten;
+                            fileStream.close(() => {
+                                resolve();
+                            });
+                        });
+                    }).on('error', (err) => {
+                        fs.unlink((0, helpers_1.getPathName)(internalPath, file.name), () => { });
+                        console.error(`Error downloading the file: ${err.message}`);
+                        reject(err);
+                    });
+                });
             }
-            if (!fs.existsSync(internalPath)) {
-                fs.mkdirSync(internalPath, { recursive: true });
+            else {
+                let fileBuffer = Buffer.from(yield file.arrayBuffer());
+                if (!skipEncryption) {
+                    fileBuffer = (0, helpers_1.encrypt)(fileBuffer, this.storeKey);
+                }
+                if (!fs.existsSync(internalPath)) {
+                    fs.mkdirSync(internalPath, { recursive: true });
+                }
+                fs.writeFileSync((0, helpers_1.getPathName)(internalPath, file.name), fileBuffer);
+                size = file.size;
+                type = file.type;
             }
-            fs.writeFileSync((0, helpers_1.getPathName)(internalPath, file.name), fileBuffer);
             return {
                 kind: web_sdk_types_1.ObjectKind.File,
                 name: file.name,
                 path: path || '/',
                 pathName: (0, helpers_1.getPathName)(path || '/', file.name),
-                absolutePathName: internalPath,
-                type: file.type,
-                size: file.size,
+                absolutePathName: (0, helpers_1.getPathName)(internalPath, file.name),
+                type,
+                size,
                 status: web_sdk_types_1.FileStatus.Synced,
             };
         });

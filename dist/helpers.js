@@ -23,7 +23,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FilePolyfill = exports.splitPathName = exports.getPathName = exports.decrypt = exports.encrypt = void 0;
+exports.FilePolyfill = void 0;
+exports.encrypt = encrypt;
+exports.decrypt = decrypt;
+exports.getPathName = getPathName;
+exports.splitPathName = splitPathName;
 const buffer_1 = require("buffer");
 const crypto = __importStar(require("crypto"));
 const algorithm = 'aes-256-ctr';
@@ -41,7 +45,6 @@ function encrypt(buffer, key) {
     const result = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
     return result;
 }
-exports.encrypt = encrypt;
 /**
  * Decrypt a buffer with a key
  * @param encrypted The encrypted buffer
@@ -56,7 +59,6 @@ function decrypt(encrypted, key) {
     const decipher = crypto.createDecipheriv(algorithm, hashedKey, iv);
     return Buffer.concat([decipher.update(data), decipher.final()]);
 }
-exports.decrypt = decrypt;
 /**
  * Get the path name of an object from a path and a name
  * @param path The path to the object
@@ -65,9 +67,8 @@ exports.decrypt = decrypt;
  * @ignore
  */
 function getPathName(path, name) {
-    return path === '/' ? path + name : path + '/' + name;
+    return '/' + getPathParts(path === '/' ? path + name : path + '/' + name).join('/');
 }
-exports.getPathName = getPathName;
 /**
  * Split a path name into its path and name
  * @param pathName The path name to split
@@ -80,7 +81,6 @@ function splitPathName(pathName) {
     const path = parts.join('/');
     return [path.length === 0 ? '/' : path, name];
 }
-exports.splitPathName = splitPathName;
 /**
  * Get the parts of a path
  * @param path The path to split

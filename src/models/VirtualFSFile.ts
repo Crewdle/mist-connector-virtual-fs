@@ -10,6 +10,7 @@ import { decrypt } from '../helpers';
 export class VirtualFSFile implements IFile {
   lastModified: number;
   private _size: number;
+  private _buffer?: Buffer;
 
   /**
    * Creates a new instance of the VirtualFSFile class.
@@ -98,10 +99,14 @@ export class VirtualFSFile implements IFile {
   }
 
   private getBuffer(): Buffer {
-    let buffer: Buffer = fs.readFileSync(this.pathName);
-    if (!this.options?.skipEncryption) {
-      buffer = decrypt(buffer, this.storeKey);
+    if (this._buffer) {
+      return this._buffer;
     }
-    return buffer;
+
+    this._buffer = fs.readFileSync(this.pathName);
+    if (!this.options?.skipEncryption) {
+      this._buffer = decrypt(this._buffer, this.storeKey);
+    }
+    return this._buffer;
   }
 }

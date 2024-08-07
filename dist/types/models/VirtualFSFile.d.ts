@@ -11,6 +11,7 @@ export declare class VirtualFSFile implements IFile {
     private options;
     lastModified: number;
     private _size;
+    private _buffer?;
     /**
      * Creates a new instance of the VirtualFSFile class.
      * @param name - The name of the file.
